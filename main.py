@@ -5,11 +5,11 @@
 import sqlite3
 
 
-def _connect_to_memory() -> None:
-    pass
+def _connect_to_memory() -> sqlite3.Connection:
+    return sqlite3.connect(":memory:")
 
 def _initial_rules() -> None:
-    print("")
+    print("TYPE SQL CODE :)")
 
 def _get_sql_input() -> str:
     """
@@ -17,6 +17,8 @@ def _get_sql_input() -> str:
     Takes lines of input until semicolon or empty input
     """
     statement = ""
+    print(">>> ", end = "")
+
     while True:
 
         next_line = input().strip()
@@ -26,15 +28,21 @@ def _get_sql_input() -> str:
 
         statement+= "\n"
 
+        print("... ", end = "")
 
-def _process_sql_statement(statement: str) -> None:
-    pass
+
+def _process_sql_statement(statement: str, connection: sqlite3.Connection) -> sqlite3.Cursor | None:
+    try:
+        return connection.execute(statement)
+    except sqlite3.OperationalError as e:
+        print(f"ERROR: {e}")
+        return None
 
 
 def main():
 
     # connects SQLite to the :memory: database
-    _connect_to_memory()
+    connection = _connect_to_memory()
 
     # prints the initial rules of the program
     _initial_rules()
@@ -44,7 +52,13 @@ def main():
         statement = _get_sql_input()
 
         # processes the statement and ensures validity
-        _process_sql_statement(statement)
+        cursor = _process_sql_statement(statement, connection)
+
+        if cursor is not None:
+            rows = cursor.fetchall()
+            if rows:
+                print(*[row for row in rows], sep = "\n")
+            cursor.close()
 
 
 
