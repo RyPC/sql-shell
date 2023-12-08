@@ -12,7 +12,7 @@ def _is_valid_db(path):
             sqlite3.connect(path).execute("PRAGMA quick_check").fetchone()[0] == 'ok')
 
 def _connect_to_database() -> sqlite3.Connection:
-    potential_path = input("Database: ")
+    potential_path = input("Database (empty to connect to memory): ")
 
     if _is_valid_db(potential_path):
         print("Connecting to database...")
@@ -28,7 +28,9 @@ def _connect_to_memory() -> sqlite3.Connection:
     return sqlite3.connect(":memory:")
 
 def _initial_rules() -> None:
-    print("TYPE SQL CODE :)")
+    print("Type [ QUIT ] to quit program")
+    print("Happy Coding!")
+    print("--------------")
 def _get_sql_input() -> str:
     """
     Takes the input for a SQL statement
@@ -40,6 +42,13 @@ def _get_sql_input() -> str:
     while True:
 
         next_line = input().strip()
+        # check for quit
+        if next_line == "QUIT":
+            print("Quitting program...")
+            print("See you again!")
+            print("--------------")
+            exit()
+
         statement+= next_line
         if next_line == "" or next_line[-1] == ";" :
             return statement
