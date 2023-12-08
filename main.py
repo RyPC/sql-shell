@@ -3,6 +3,25 @@
 # SQL Shell - Personal Project
 
 import sqlite3
+import os
+
+
+def _is_valid_db(path):
+    return (os.path.exists(path) and
+            os.path.isfile(path) and
+            sqlite3.connect(path).execute("PRAGMA quick_check").fetchone()[0] == 'ok')
+
+def _connect_to_database() -> sqlite3.Connection:
+    potential_path = input("Database: ")
+
+    if _is_valid_db(potential_path):
+        print("Connecting to database...")
+        return sqlite3.connect(potential_path)
+
+    if potential_path != ":memory:" and potential_path != "":
+        print("Couldn't find given file")
+    print("Connecting to :memory...")
+    return _connect_to_memory()
 
 
 def _connect_to_memory() -> sqlite3.Connection:
@@ -10,7 +29,6 @@ def _connect_to_memory() -> sqlite3.Connection:
 
 def _initial_rules() -> None:
     print("TYPE SQL CODE :)")
-
 def _get_sql_input() -> str:
     """
     Takes the input for a SQL statement
@@ -41,8 +59,8 @@ def _process_sql_statement(statement: str, connection: sqlite3.Connection) -> sq
 
 def main():
 
-    # connects SQLite to the :memory: database
-    connection = _connect_to_memory()
+    # connects SQLite to an input database
+    connection = _connect_to_database()
 
     # prints the initial rules of the program
     _initial_rules()
